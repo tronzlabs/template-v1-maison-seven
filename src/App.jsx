@@ -5,6 +5,7 @@ import Cursor from "./components/Cursor.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 import PageTransition from "./components/PageTransition.jsx";
+import StartProjectOverlay from "./components/StartProjectOverlay.jsx";
 
 import Home from "./pages/Home.jsx";
 import Projects from "./pages/Projects.jsx";
@@ -35,6 +36,7 @@ export default function App() {
         </PageTransition>
 
         <Footer />
+        <StartProjectOverlay />
       </div>
     </SmoothScroll>
   );
