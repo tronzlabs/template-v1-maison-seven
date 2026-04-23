@@ -4,6 +4,7 @@ import {
   ContactShadows,
   Environment,
   Float,
+  RoundedBox,
   PerspectiveCamera,
 } from "@react-three/drei";
 import * as THREE from "three";
@@ -59,6 +60,7 @@ export default function Scene3D({ scrollRef, className = "" }) {
 
           <Room />
           <Furniture />
+          <Decor />
           <FloatingObjects />
 
           <ContactShadows
@@ -143,6 +145,7 @@ function Lights() {
   return (
     <>
       <ambientLight intensity={0.35} color="#FDF6E8" />
+      <hemisphereLight args={["#FFF6E8", "#DCCFB8", 0.28]} />
 
       {/* Warm sun through the window — main shadow caster */}
       <directionalLight
@@ -169,6 +172,16 @@ function Lights() {
 
       {/* Bedroom warm practical */}
       <pointLight position={[-2.2, 1.2, -3.8]} intensity={1.4} distance={3.5} decay={1.7} color="#E7B574" />
+
+      {/* Ceiling bounce adds believable ambient fill */}
+      <rectAreaLight
+        position={[0, 3.9, -2.8]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        width={8}
+        height={5}
+        intensity={0.8}
+        color="#F8F1E2"
+      />
     </>
   );
 }
@@ -211,6 +224,12 @@ function Room() {
         <planeGeometry args={[20, 20]} />
       </mesh>
 
+      {/* Subtle rug to break flat floor reflection */}
+      <mesh rotation-x={-Math.PI / 2} position={[-1.15, 0.012, -1.35]} receiveShadow>
+        <planeGeometry args={[3.4, 2.2]} />
+        <meshStandardMaterial color="#C9B79C" roughness={0.95} metalness={0} />
+      </mesh>
+
       <mesh position={[0, 2.4, -8]} receiveShadow material={plaster}>
         <boxGeometry args={[20, 5, 0.2]} />
       </mesh>
@@ -228,6 +247,12 @@ function Room() {
       <mesh position={[0, 0.04, -7.9]}>
         <boxGeometry args={[20, 0.08, 0.03]} />
         <meshStandardMaterial color="#C2A878" metalness={0.4} roughness={0.45} />
+      </mesh>
+
+      {/* Ceiling coves for depth */}
+      <mesh position={[0, 4.85, -3]} receiveShadow>
+        <boxGeometry args={[20, 0.18, 10]} />
+        <meshStandardMaterial color="#F2ECE2" roughness={0.9} metalness={0} />
       </mesh>
     </group>
   );
@@ -349,6 +374,16 @@ function Furniture() {
           <boxGeometry args={[0.7, 0.18, 0.4]} />
           <meshStandardMaterial color="#F6F2E6" roughness={0.98} />
         </mesh>
+
+        {/* Bedside blocks */}
+        <mesh position={[-1.3, 0.26, -0.35]} castShadow receiveShadow>
+          <boxGeometry args={[0.5, 0.52, 0.5]} />
+          <meshStandardMaterial color="#CAB89A" roughness={0.88} />
+        </mesh>
+        <mesh position={[1.3, 0.26, -0.35]} castShadow receiveShadow>
+          <boxGeometry args={[0.5, 0.52, 0.5]} />
+          <meshStandardMaterial color="#CAB89A" roughness={0.88} />
+        </mesh>
       </group>
 
       <group position={[1.4, 0, -5.6]}>
@@ -363,6 +398,88 @@ function Furniture() {
               <meshStandardMaterial color="#C2A878" metalness={0.4} roughness={0.5} />
             </mesh>
           </group>
+        ))}
+      </group>
+    </group>
+  );
+}
+
+/* ------------------------------- Decor -------------------------------- */
+
+function Decor() {
+  return (
+    <group>
+      {/* Curtains by the window */}
+      <mesh position={[-4.93, 2.1, -1.2]} rotation={[0, Math.PI / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.2, 2.5, 0.05]} />
+        <meshStandardMaterial color="#ECE5D9" roughness={0.98} metalness={0} />
+      </mesh>
+      <mesh position={[-4.93, 2.1, -2.8]} rotation={[0, Math.PI / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.2, 2.5, 0.05]} />
+        <meshStandardMaterial color="#E5DCCD" roughness={0.98} metalness={0} />
+      </mesh>
+
+      {/* Wall art */}
+      <group position={[4.88, 2.2, -2.9]} rotation={[0, -Math.PI / 2, 0]}>
+        <RoundedBox args={[2.1, 1.25, 0.08]} radius={0.04} smoothness={4} castShadow receiveShadow>
+          <meshStandardMaterial color="#201E1B" roughness={0.62} metalness={0.15} />
+        </RoundedBox>
+        <mesh position={[0, 0, 0.05]}>
+          <planeGeometry args={[1.82, 0.98]} />
+          <meshStandardMaterial
+            color="#B89A6D"
+            emissive="#5A4228"
+            emissiveIntensity={0.12}
+            roughness={0.5}
+            metalness={0.2}
+          />
+        </mesh>
+      </group>
+
+      {/* Dining chairs */}
+      {[
+        [2.25, 0, -1.35],
+        [2.25, 0, -2.65],
+      ].map(([x, y, z], i) => (
+        <group key={i} position={[x, y, z]}>
+          <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.65, 0.08, 0.65]} />
+            <meshStandardMaterial color="#171615" roughness={0.62} metalness={0.22} />
+          </mesh>
+          <mesh position={[0, 0.82, -0.26]} castShadow>
+            <boxGeometry args={[0.65, 0.62, 0.08]} />
+            <meshStandardMaterial color="#181716" roughness={0.62} metalness={0.18} />
+          </mesh>
+          {[
+            [-0.26, 0.22, -0.26],
+            [0.26, 0.22, -0.26],
+            [-0.26, 0.22, 0.26],
+            [0.26, 0.22, 0.26],
+          ].map((leg, li) => (
+            <mesh key={li} position={leg} castShadow>
+              <boxGeometry args={[0.06, 0.44, 0.06]} />
+              <meshStandardMaterial color="#131211" roughness={0.48} metalness={0.35} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+
+      {/* Plant cluster for lived-in detail */}
+      <group position={[-3.6, 0, -2.2]}>
+        <mesh position={[0, 0.28, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.26, 0.3, 0.56, 28]} />
+          <meshStandardMaterial color="#BC9D72" roughness={0.6} metalness={0.22} />
+        </mesh>
+        {[
+          [-0.12, 0.76, 0.02, 0.42],
+          [0.1, 0.82, -0.06, 0.38],
+          [0.04, 0.95, 0.08, 0.34],
+          [-0.06, 0.92, -0.12, 0.3],
+        ].map(([x, y, z, s], i) => (
+          <mesh key={i} position={[x, y, z]} castShadow>
+            <sphereGeometry args={[s * 0.5, 18, 18]} />
+            <meshStandardMaterial color="#6D8A64" roughness={0.86} metalness={0.02} />
+          </mesh>
         ))}
       </group>
     </group>
