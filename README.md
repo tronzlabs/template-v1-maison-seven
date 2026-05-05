@@ -141,3 +141,8 @@ crisply on laptops while still feeling architectural.
 
 Demonstration project. Imagery via Unsplash. Studio, team, timeline, and press
 quotes are fictional.
+
+## Branding
+
+- Template branding and attribution by Tronzlabs
+- Website: [tronzlabs.com](https://tronzlabs.com)
